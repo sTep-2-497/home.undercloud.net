@@ -1,5 +1,5 @@
 # Environment and secret files
-.env
+*.env
 *.key
 *.pem
 
@@ -10,3 +10,5 @@ Thumbs.db
 # Logs and temporary files
 *.log
 tmp/
+
+# Super secret files
