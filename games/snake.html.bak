@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Snake</title>
+    <style>
+        :root {
+            --bg0: #282828;
+            --bg0-dim: rgba(40, 40, 40, 0.85);
+            --bg1: #3c3836;
+            --gray: #928374;
+            --neon-aqua: #8ec07c;
+            --neon-orange: #fe8019;
+            --fg: #ebdbb2;
+        }
+
+        body {
+            background-color: var(--bg0);
+            color: var(--fg);
+            font-family: monospace;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* BACKGROUND REVEAL ANIMATIONS */
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('../assets/homepage_bg.png'); background-size: cover;
+            background-position: center; z-index: 1;
+            clip-path: circle(0% at 100% 100%);
+            animation: imageGrowRight 1s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+        }
+
+        body::after {
+            content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--bg0-dim); z-index: 2;
+            transform: translateY(100%);
+            animation: slideUp 0.9s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+            animation-delay: 0.2s;
+        }
+
+        @keyframes imageGrowRight { 0% { clip-path: circle(0% at 100% 100%); } 100% { clip-path: circle(150% at 100% 100%); } }
+        @keyframes slideUp { 0% { transform: translateY(100%); } 100% { transform: translateY(0%); } }
+
+        .layout-container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+            opacity: 0;
+            animation: uiFadeIn 0.6s ease-out forwards;
+            animation-delay: 0.8s;
+        }
+
+        @keyframes uiFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .btn-back {
+            text-decoration: none;
+            color: var(--neon-orange);
+            background: var(--bg1);
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid var(--gray);
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            align-self: flex-start;
+        }
+        .btn-back:hover {
+            background: var(--neon-orange);
+            color: var(--bg0);
+        }
+
+        .game-wrapper {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .game-column {
+            width: 406px;
+            flex-grow: 0;
+        }
+
+        #game-container {
+            width: 400px;
+            height: 400px;
+            position: relative;
+        }
+
+        canvas {
+            background: #282828;
+            border: 2px solid var(--gray);
+            display: block;
+        }
+
+        .sidebar {
+            width: 140px;
+        }
+
+        .panel {
+            background: #282828;
+            border: 1px solid var(--gray);
+            border-left: 4px solid var(--neon-aqua);
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+
+        .panel-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .speed-btn {
+            background: #3c3836;
+            color: #ebdbb2;
+            border: 1px solid var(--gray);
+            padding: 5px 10px;
+            cursor: pointer;
+            margin-right: 4px;
+        }
+
+        .speed-btn.active {
+            background: var(--neon-aqua);
+            color: #282828;
+            font-weight: bold;
+        }
+
+        #global-pause-overlay {
+            display: none;
+            position: absolute;
+            top: 0; left: 0;
+            width: 400px; height: 400px;
+            background: rgba(0, 0, 0, 0.75);
+            color: #fabd2f;
+            font-size: 1.5rem;
+            font-weight: bold;
+            justify-content: center;
+            align-items: center;
+            z-index: 30;
+        }
+
+        #notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .notification {
+            background: #fb4934;
+            color: #ebdbb2;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="notification-container"></div>
+
+    <div class="layout-container">
+        <a href="/" class="btn-back">&lt; Return Home</a>
+
+        <div class="game-wrapper">
+            <!-- Main Board -->
+            <div class="game-column">
+                <div id="game-container">
+                    <div id="global-pause-overlay">PAUSED</div>
+                    <canvas id="snakeGame" width="400" height="400"></canvas>
+                </div>
+            </div>
+
+            <!-- Sidebar Panel -->
+            <div class="sidebar">
+                <div class="panel">
+                    <div class="panel-title">Score</div>
+                    <div id="score" style="font-size: 1.5rem; font-weight: bold;">0</div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-title">Speed</div>
+                    <button class="speed-btn active" onclick="setSpeed(10, this)">1x</button>
+                    <button class="speed-btn" onclick="setSpeed(15, this)">1.5x</button>
+                    <button class="speed-btn" onclick="setSpeed(20, this)">2x</button>
+                </div>
+
+                <div class="panel">
+                    <button id="pause-btn" class="speed-btn" style="width: 100%;" onclick="togglePause()">PAUSE (P)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const canvas = document.getElementById("snakeGame");
+    const ctx = canvas.getContext("2d");
+    const scoreElement = document.getElementById("score");
+
+    let snake = [{ x: 10, y: 10 }];
+    let food = { x: 5, y: 5 };
+    let dx = 0, dy = 0;
+    let nextDx = 0, nextDy = 0; // Input buffer
+    let score = 0;
+    let speed = 10;
+    let isPaused = false;
+    let isGameOver = false;
+    let gameLoopTimeout;
+
+    function main() {
+        if (isGameOver) return;
+        if (isPaused) {
+            gameLoopTimeout = setTimeout(main, 1000 / speed);
+            return;
+        }
+
+        gameLoopTimeout = setTimeout(function onTick() {
+            // Apply the buffered direction
+            dx = nextDx;
+            dy = nextDy;
+            
+            clearCanvas();
+            drawFood();
+            advanceSnake();
+            drawSnake();
+            main();
+        }, 1000 / speed);
+    }
+
+    function clearCanvas() {
+        ctx.fillStyle = "#282828";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function drawSnake() {
+        snake.forEach((part, index) => {
+            ctx.fillStyle = index === 0 ? "#8ec07c" : "#b8bb26";
+            ctx.fillRect(part.x * 20, part.y * 20, 18, 18);
+        });
+    }
+
+    function advanceSnake() {
+        const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+        if (dx === 0 && dy === 0) return;
+
+        snake.unshift(head);
+        if (head.x === food.x && head.y === food.y) {
+            score += 1;
+            scoreElement.innerText = score;
+            createFood();
+        } else {
+            snake.pop();
+        }
+
+        if (head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20 || collision(head)) {
+            handleDeath();
+        }
+    }
+
+    function collision(head) {
+        for (let i = 1; i < snake.length; i++) {
+            if (snake[i].x === head.x && snake[i].y === head.y) return true;
+        }
+        return false;
+    }
+
+    function createFood() {
+        food.x = Math.floor(Math.random() * 20);
+        food.y = Math.floor(Math.random() * 20);
+    }
+
+    function drawFood() {
+        ctx.fillStyle = "#fb4934";
+        ctx.fillRect(food.x * 20, food.y * 20, 18, 18);
+    }
+
+    function notify(text) {
+        const container = document.getElementById("notification-container");
+        const n = document.createElement("div");
+        n.className = "notification";
+        n.innerText = text;
+        container.appendChild(n);
+        setTimeout(() => n.remove(), 3000);
+    }
+
+    function setSpeed(val, btn) {
+        speed = val;
+        document.querySelectorAll(".speed-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+    }
+
+    function togglePause() {
+        isPaused = !isPaused;
+        document.getElementById("global-pause-overlay").style.display = isPaused ? "flex" : "none";
+        document.getElementById("pause-btn").innerText = isPaused ? "RESUME (P)" : "PAUSE (P)";
+    }
+
+    window.addEventListener("keydown", e => {
+        if (e.key === "p" || e.key === "P") togglePause();
+        if (isPaused) return;
+
+        // Prevent page scrolling when using arrow keys
+        if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+            e.preventDefault();
+        }
+
+        // Use nextDx/nextDy to buffer the move until the next tick
+        if (e.key === "ArrowUp" && dy === 0) { nextDx = 0; nextDy = -1; }
+        if (e.key === "ArrowDown" && dy === 0) { nextDx = 0; nextDy = 1; }
+        if (e.key === "ArrowLeft" && dx === 0) { nextDx = -1; nextDy = 0; }
+        if (e.key === "ArrowRight" && dx === 0) { nextDx = 1; nextDy = 0; }
+    });
+
+    function handleDeath() {
+        isGameOver = true;
+        notify("GAME OVER | SCORE: " + score);
+        setTimeout(resetGame, 1500);
+    }
+
+    function resetGame() {
+        clearTimeout(gameLoopTimeout);
+        score = 0; scoreElement.innerText = "0";
+        snake = [{ x: 10, y: 10 }]; dx = 0; dy = 0; nextDx = 0; nextDy = 0;
+        isGameOver = false; isPaused = false;
+        document.getElementById("global-pause-overlay").style.display = "none";
+        main();
+    }
+
+    main();
+</script>
+</body>
+</html>

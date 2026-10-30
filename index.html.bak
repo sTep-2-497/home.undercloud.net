@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Userver | Undercloud</title>
+    <style>
+        :root {
+            --bg0: #282828; --bg0-dim: rgba(40, 40, 40, 0.8);
+            --bg1: #3c3836; --fg: #ebdbb2;
+            --neon-aqua: #8ec07c; --neon-orange: #fe8019;
+            --neon-yellow: #fabd2f; --shadow: rgba(0, 0, 0, 0.5);
+            --gray: #928374;
+        }
+
+        body {
+            margin: 0; padding: 0; color: var(--fg);
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            display: flex; flex-direction: column; align-items: center; 
+            justify-content: center; height: 100vh; overflow: hidden;
+            background-color: var(--bg0);
+        }
+
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('assets/homepage_bg.png'); background-size: cover;
+            background-position: center; z-index: 1;
+            clip-path: circle(0% at 100% 100%);
+            animation: imageGrowRight 1s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+        }
+
+        body::after {
+            content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--bg0-dim); z-index: 2;
+            transform: translateY(100%);
+            animation: slideUp 0.9s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+            animation-delay: 0.2s;
+        }
+
+        @keyframes imageGrowRight { 0% { clip-path: circle(0% at 100% 100%); } 100% { clip-path: circle(150% at 100% 100%); } }
+        @keyframes slideUp { 0% { transform: translateY(100%); } 100% { transform: translateY(0%); } }
+
+        .layout-container {
+            position: relative; z-index: 10; display: flex;
+            flex-direction: column; gap: 20px; align-items: center;
+            opacity: 0; animation: uiFadeIn 0.6s ease-out forwards; animation-delay: 0.8s;
+        }
+
+        .main-wrapper { display: flex; align-items: stretch; gap: 20px; }
+        @keyframes uiFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* GAMES BOX WITH PIPES */
+        .games-box { 
+            background: var(--bg1); 
+            border-radius: 10px; 
+            border: 1px solid #504945; 
+            min-width: 200px; 
+            box-shadow: 0 5px 15px var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #pipes-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.35;
+            pointer-events: none; /* Crucial: clicks pass through pipes to buttons */
+        }
+
+        .games-content { 
+            position: relative;
+            z-index: 2;
+            padding: 1.5rem; 
+        }
+
+        .btn-trophy {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(254, 128, 25, 0.1);
+            color: var(--neon-orange);
+            text-decoration: none;
+            border-right: 1px solid #504945;
+            border-bottom: 1px solid #504945;
+            font-size: 1.2rem;
+            transition: all 0.2s ease;
+            z-index: 10; /* Ensures it sits on top of everything in the box */
+            cursor: pointer;
+        }
+        .btn-trophy:hover { background: var(--neon-orange); transform: scale(1.05); color: var(--bg0); }
+
+        .box-title { 
+            font-size: 0.7rem; 
+            text-transform: uppercase; 
+            letter-spacing: 1.5px; 
+            color: var(--neon-yellow); 
+            margin-bottom: 10px; 
+            font-weight: bold;
+            padding-left: 30px; 
+        }
+        
+        .separator { height: 1px; background: #504945; width: 100%; margin-bottom: 15px; }
+
+        .btn-game {
+            display: flex; align-items: center; text-decoration: none; color: var(--fg);
+            background: rgba(40, 40, 40, 0.6); padding: 8px 12px; border-radius: 5px;
+            font-size: 0.9rem; transition: all 0.2s ease; border: 1px solid transparent; margin-bottom: 8px;
+            backdrop-filter: blur(2px);
+            position: relative;
+            z-index: 3;
+        }
+        .btn-game:hover { background: rgba(250, 189, 47, 0.1); border-color: var(--neon-yellow); transform: translateX(5px); }
+
+        .container {
+            text-align: center; background: var(--bg1); padding: 2.5rem 3.5rem;
+            border-radius: 15px; border: 1px solid #504945; min-width: 380px;
+            box-shadow: 0 10px 30px var(--shadow);
+        }
+
+        h1 { margin: 0 0 1.5rem 0; font-size: 2.8rem; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 0px var(--bg0); }
+        .nav-wrapper { display: flex; gap: 20px; justify-content: center; }
+        
+        .btn { 
+            text-decoration: none; padding: 14px 30px; font-weight: bold; font-size: 1.1rem;
+            border-radius: 8px; text-transform: uppercase; border: 2px solid transparent; transition: 0.3s; 
+        }
+        .btn-files { color: var(--neon-aqua); border-color: var(--neon-aqua); }
+        .btn-files:hover { background: var(--neon-aqua); color: var(--bg0); box-shadow: 0 0 20px rgba(142, 192, 124, 0.4); }
+        
+        .btn-stream { color: var(--neon-orange); border-color: var(--neon-orange); }
+        .btn-stream:hover { background: var(--neon-orange); color: var(--bg0); box-shadow: 0 0 20px rgba(254, 128, 25, 0.4); }
+        
+        .status-dot { height: 10px; width: 10px; background-color: #b8bb26; border-radius: 50%; display: inline-block; margin-right: 8px; box-shadow: 0 0 8px #b8bb26; }
+        footer { margin-top: 1.5rem; font-size: 0.85rem; color: #7c6f64; }
+    </style>
+</head>
+<body>
+
+    <div class="layout-container">
+        <div class="main-wrapper">
+            <div class="games-box" id="pipes-container">
+                <!-- CANVAS FOR THE EFFECT -->
+                <canvas id="pipes-canvas"></canvas>
+                
+                <div class="games-content">
+                    <div class="box-title">ARCHIVE / GAMES</div>
+                    <div class="separator"></div>
+                    <a href="games/snake.html" class="btn-game">🐍 Snake</a>
+                    <a href="games/tetris.html" class="btn-game">🧱 Tetris</a>
+
+            <div class="container">
+                <h1>Userver</h1>
+                <div class="nav-wrapper">
+                    <a href="https://files.undercloud.net" class="btn btn-files">Files</a>
+                    <a href="https://stream.undercloud.net" class="btn btn-stream">Stream</a>
+                </div>
+                <footer><span class="status-dot"></span> System Operational</footer>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const pCanvas = document.getElementById('pipes-canvas');
+        const pCtx = pCanvas.getContext('2d');
+        const container = document.getElementById('pipes-container');
+        let width, height, columns, rows, pipes = [];
+        const size = 12; 
+        const colors = ['#8ec07c', '#fe8019', '#fb4934', '#fabd2f', '#d3869b'];
+
+        function initPipes() {
+            width = pCanvas.width = container.offsetWidth;
+            height = pCanvas.height = container.offsetHeight;
+            columns = Math.floor(width / size);
+            rows = Math.floor(height / size);
+            pipes = [];
+            for (let i = 0; i < 4; i++) pipes.push(new Pipe());
+        }
+
+        class Pipe {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.floor(Math.random() * columns);
+                this.y = Math.floor(Math.random() * rows);
+                this.dir = Math.floor(Math.random() * 4);
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.life = 0;
+                this.maxLife = 15 + Math.random() * 40;
+            }
+            draw() {
+                pCtx.strokeStyle = this.color;
+                pCtx.lineWidth = 2;
+                pCtx.lineCap = 'round';
+                pCtx.beginPath();
+                pCtx.moveTo(this.x * size + size/2, this.y * size + size/2);
+                
+                if (Math.random() < 0.2) this.dir = (this.dir + (Math.random() < 0.5 ? 1 : 3)) % 4;
+                
+                if (this.dir === 0) this.y--;
+                else if (this.dir === 1) this.x++;
+                else if (this.dir === 2) this.y++;
+                else if (this.dir === 3) this.x--;
+                
+                if (this.x < 0) this.x = columns - 1; if (this.x >= columns) this.x = 0;
+                if (this.y < 0) this.y = rows - 1; if (this.y >= rows) this.y = 0;
+                
+                pCtx.lineTo(this.x * size + size/2, this.y * size + size/2);
+                pCtx.stroke();
+                
+                this.life++;
+                if (this.life > this.maxLife) this.reset();
+            }
+        }
+
+        function animatePipes() {
+            pCtx.fillStyle = 'rgba(60, 56, 54, 0.15)'; 
+            pCtx.fillRect(0, 0, width, height);
+            pipes.forEach(p => p.draw());
+            requestAnimationFrame(animatePipes);
+        }
+
+        window.addEventListener('resize', initPipes);
+        initPipes();
+        animatePipes();
+    </script>
+</body>
+</html>

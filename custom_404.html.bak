@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 | Page Not Found</title>
+    <style>
+        :root {
+            --bg: #282828;
+            --bg-panel: #1d2021;
+            --fg: #ebdbb2;
+            --red: #fb4934;
+            --orange: #fe8019;
+            --green: #b8bb26;
+            --aqua: #8ec07c;
+            --gray: #928374;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--fg);
+            font-family: monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: var(--bg-panel);
+            border: 2px solid var(--gray);
+            border-left: 6px solid var(--orange);
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        .ascii-header {
+            color: var(--red);
+            font-size: 0.8rem;
+            line-height: 1.1;
+            white-space: pre;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: var(--orange);
+            margin: 0 0 10px 0;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+        }
+
+        p {
+            color: var(--fg);
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .code-box {
+            background-color: var(--bg);
+            border: 1px solid var(--gray);
+            padding: 10px;
+            font-size: 0.9rem;
+            color: var(--aqua);
+            margin-bottom: 25px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: var(--bg);
+            color: var(--fg);
+            border: 1px solid var(--gray);
+            padding: 8px 16px;
+            text-decoration: none;
+            font-family: monospace;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: var(--orange);
+            color: var(--bg);
+            border-color: var(--orange);
+        }
+
+        .btn-primary {
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        .btn-primary:hover {
+            background: var(--green);
+            color: var(--bg);
+        }
+
+        .timer {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="ascii-header">
+  _  _    ___  _  _ 
+ | || |  / _ \| || |
+ | || |_| | | | || |_
+ |__   _| |_| |__   _|
+    |_|  \___/   |_|  
+        </div>
+
+        <h1>404 - Signal Lost</h1>
+        <p>The requested path does not exist on this server or has been relocated.</p>
+
+        <div class="code-box">
+            $ status: ERR_NOT_FOUND<br>
+            $ target: <span id="current-path">/unknown</span>
+        </div>
+
+        <div class="nav-links">
+            <a href="/" class="btn btn-primary">&lt; Return Home</a>
+            <a href="/games/tetris/" class="btn">Play Tetris</a>
+        </div>
+
+        <div class="timer">
+            Auto-redirecting home in <span id="countdown">15</span>s...
+        </div>
+    </div>
+
+    <script>
+        // Display path user attempted to access
+        document.getElementById('current-path').textContent = window.location.pathname;
+
+        // Auto-redirect countdown
+        let seconds = 15;
+        const countdownEl = document.getElementById('countdown');
+
+        const timer = setInterval(() => {
+            seconds--;
+            countdownEl.textContent = seconds;
+            if (seconds <= 0) {
+                clearInterval(timer);
+                window.location.href = '/';
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
