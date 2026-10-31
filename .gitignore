@@ -12,4 +12,4 @@ Thumbs.db
 tmp/
 
 # Super secret files
-
+.secretes/
