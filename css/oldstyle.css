@@ -1,0 +1,190 @@
+:root {
+    --bg0: #282828; 
+    --bg1: #3c3836; 
+    --fg: #ebdbb2;
+    --neon-aqua: #8ec07c; 
+    --neon-orange: #fe8019;
+    --neon-yellow: #fabd2f; 
+    --shadow: rgba(0, 0, 0, 0.5);
+    --gray: #928374;
+}
+
+body {
+    margin: 0; 
+    padding: 0; 
+    color: var(--fg);
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    height: 100vh; 
+    overflow: hidden;
+    background-color: var(--bg0);
+    position: relative;
+}
+
+/* FULLSCREEN PIPES CANVAS */
+#pipes-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+.layout-container {
+    position: relative; 
+    z-index: 10; 
+    display: flex;
+    flex-direction: column; 
+    gap: 20px; 
+    align-items: center;
+    opacity: 0; 
+    animation: uiFadeIn 0.6s ease-out forwards; 
+    animation-delay: 0.2s;
+}
+
+.main-wrapper { 
+    display: flex; 
+    align-items: stretch; 
+    gap: 20px; 
+}
+
+@keyframes uiFadeIn { 
+    from { opacity: 0; transform: translateY(10px); } 
+    to { opacity: 1; transform: translateY(0); } 
+}
+
+/* GAMES BOX */
+.games-box { 
+    background: var(--bg1); 
+    border-radius: 10px; 
+    border: 1px solid #504945; 
+    min-width: 200px; 
+    box-shadow: 0 5px 15px var(--shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.games-content { 
+    position: relative;
+    z-index: 2;
+    padding: 1.5rem; 
+}
+
+.box-title { 
+    font-size: 0.7rem; 
+    text-transform: uppercase; 
+    letter-spacing: 1.5px; 
+    color: var(--neon-yellow); 
+    margin-bottom: 10px; 
+    font-weight: bold;
+    padding-left: 30px; 
+}
+
+.separator { 
+    height: 1px; 
+    background: #504945; 
+    width: 100%; 
+    margin-bottom: 15px; 
+}
+
+.btn-game {
+    display: flex; 
+    align-items: center; 
+    text-decoration: none; 
+    color: var(--fg);
+    background: rgba(40, 40, 40, 0.6); 
+    padding: 8px 12px; 
+    border-radius: 5px;
+    font-size: 0.9rem; 
+    transition: all 0.2s ease; 
+    border: 1px solid transparent; 
+    margin-bottom: 8px;
+    backdrop-filter: blur(2px);
+    position: relative;
+    z-index: 3;
+}
+
+.btn-game:hover { 
+    background: rgba(250, 189, 47, 0.1); 
+    border-color: var(--neon-yellow); 
+    transform: translateX(5px); 
+}
+
+.container {
+    text-align: center; 
+    background: var(--bg1); 
+    padding: 2.5rem 3.5rem;
+    border-radius: 15px; 
+    border: 1px solid #504945; 
+    min-width: 380px;
+    box-shadow: 0 10px 30px var(--shadow);
+}
+
+h1 { 
+    margin: 0 0 1.5rem 0; 
+    font-size: 2.8rem; 
+    text-transform: uppercase; 
+    letter-spacing: 2px; 
+    text-shadow: 2px 2px 0px var(--bg0); 
+}
+
+.nav-wrapper { 
+    display: flex; 
+    gap: 20px; 
+    justify-content: center; 
+}
+
+.btn { 
+    text-decoration: none; 
+    padding: 14px 30px; 
+    font-weight: bold; 
+    font-size: 1.1rem;
+    border-radius: 8px; 
+    text-transform: uppercase; 
+    border: 2px solid transparent; 
+    transition: 0.3s; 
+}
+
+.btn-files { 
+    color: var(--neon-aqua); 
+    border-color: var(--neon-aqua); 
+}
+
+.btn-files:hover { 
+    background: var(--neon-aqua); 
+    color: var(--bg0); 
+    box-shadow: 0 0 20px rgba(142, 192, 124, 0.4); 
+}
+
+.btn-stream { 
+    color: var(--neon-orange); 
+    border-color: var(--neon-orange); 
+}
+
+.btn-stream:hover { 
+    background: var(--neon-orange); 
+    color: var(--bg0); 
+    box-shadow: 0 0 20px rgba(254, 128, 25, 0.4); 
+}
+
+.status-dot { 
+    height: 10px; 
+    width: 10px; 
+    background-color: #b8bb26; 
+    border-radius: 50%; 
+    display: inline-block; 
+    margin-right: 8px; 
+    box-shadow: 0 0 8px #b8bb26; 
+}
+
+footer { 
+    margin-top: 1.5rem; 
+    font-size: 0.85rem; 
+    color: #7c6f64; 
+}
